@@ -3,205 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Matriz CORE V20 - Sistema Integrado</title>
+    <title>Matriz CORE V20 - Suite</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root {
-            --bg: #000000;
-            --card: #121212;
-            --accent: #ff8c00;
-            --neon: #00f2ff;
-            --ok: #00ff88;
-            --no: #ff4444;
-            --blanco: #ffffff;
-        }
-
-        body {
-            background-color: var(--bg);
-            color: var(--blanco);
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-        }
-
-        /* --- INTERFAZ COMENSAL (FRONTEND) --- */
+        :root { --bg: #000; --card: #121212; --accent: #ff8c00; --neon: #00f2ff; --ok: #00ff88; --no: #ff4444; --blanco: #fff; }
+        body { background-color: var(--bg); color: var(--blanco); font-family: sans-serif; margin: 0; padding: 0; }
         #vista-comensal { display: block; }
-        
         .header { text-align: center; padding: 30px 10px; }
         #banner-cliente { width: 100%; max-height: 180px; object-fit: cover; display: none; border-bottom: 2px solid var(--accent); }
-        
-        .marca-titulo { 
-            color: var(--accent); 
-            text-transform: uppercase; 
-            letter-spacing: 4px; 
-            cursor: pointer; 
-            user-select: none;
-            text-shadow: 0 0 10px rgba(255, 140, 0, 0.5);
-        }
-
-        /* Acordeones */
-        .categoria-btn {
-            width: 100%;
-            background: var(--card);
-            border: none;
-            border-bottom: 1px solid #222;
-            color: var(--blanco);
-            padding: 20px;
-            text-align: left;
-            font-size: 1.1rem;
-            font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-        }
-
-        .categoria-btn i { color: var(--accent); margin-right: 15px; }
-
-        .categoria-contenido {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.5s ease-out;
-            background: #080808;
-        }
-
-        .categoria-contenido.abierto { max-height: 5000px; transition: max-height 0.8s ease-in; }
-
-        /* Tarjeta de Producto */
-        .producto-card {
-            display: flex;
-            background: #151515;
-            margin: 15px;
-            border-radius: 8px;
-            overflow: hidden;
-            position: relative;
-            border: 1px solid #222;
-        }
-
-        .producto-card.agotado { filter: grayscale(1); opacity: 0.6; }
-        
-        .luz-stock {
-            position: absolute; top: 8px; left: 8px;
-            width: 10px; height: 10px; border-radius: 50%;
-            z-index: 5;
-        }
+        .marca-titulo { color: var(--accent); text-transform: uppercase; letter-spacing: 4px; cursor: pointer; }
+        .categoria-btn { width: 100%; background: var(--card); border: none; border-bottom: 1px solid #222; color: #fff; padding: 20px; text-align: left; font-size: 1.1rem; display: flex; justify-content: space-between; cursor: pointer; }
+        .categoria-contenido { max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out; background: #080808; }
+        .categoria-contenido.abierto { max-height: 5000px; }
+        .producto-card { display: flex; background: #151515; margin: 15px; border-radius: 8px; overflow: hidden; position: relative; border: 1px solid #222; }
+        .producto-card.agotado { filter: grayscale(1); opacity: 0.5; }
+        .luz-stock { position: absolute; top: 8px; left: 8px; width: 10px; height: 10px; border-radius: 50%; }
         .luz-verde { background: var(--ok); box-shadow: 0 0 8px var(--ok); }
         .luz-roja { background: var(--no); box-shadow: 0 0 8px var(--no); }
-
         .prod-img { width: 100px; height: 100px; object-fit: cover; }
         .prod-info { padding: 10px; flex: 1; }
-        .prod-info h3 { margin: 0; font-size: 1rem; color: var(--blanco); }
-        .prod-info p { margin: 5px 0; font-size: 0.8rem; color: #888; }
+        .prod-info h3 { margin: 0; font-size: 1rem; }
         .prod-precio { color: var(--neon); font-weight: bold; }
-
-        .badge-agotado {
-            position: absolute; top: 35%; left: 10%;
-            background: var(--no); color: white;
-            padding: 5px 15px; font-weight: bold;
-            transform: rotate(-15deg); border: 1px solid white;
-        }
-
-        /* --- CONSOLA DE CARGA (OCULTA) --- */
-        #vista-editor { 
-            display: none; 
-            padding: 20px; 
-            background: #000; 
-            border: 2px solid var(--neon);
-            margin: 10px;
-            border-radius: 10px;
-        }
-
-        .campo-editor {
-            width: 100%; padding: 12px; margin-bottom: 10px;
-            background: #111; border: 1px solid #333; color: white;
-            border-radius: 5px; box-sizing: border-box;
-        }
-
-        .btn-accion {
-            width: 100%; padding: 15px; background: var(--accent);
-            border: none; color: white; font-weight: bold;
-            border-radius: 5px; margin-top: 10px; cursor: pointer;
-        }
-
-        .modulo-edit {
-            background: #1a1a1a; padding: 15px; border-radius: 8px;
-            margin-bottom: 15px; border-left: 4px solid var(--neon);
-        }
-
-        /* Botón WhatsApp Flotante */
-        .btn-ws {
-            position: fixed; bottom: 20px; right: 20px;
-            background: #25d366; width: 60px; height: 60px;
-            border-radius: 50%; display: flex; align-items: center;
-            justify-content: center; font-size: 1.8rem; color: white;
-            text-decoration: none; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-        }
+        #vista-editor { display: none; padding: 20px; background: #000; border: 2px solid var(--neon); margin: 10px; border-radius: 10px; }
+        .campo-editor { width: 100%; padding: 12px; margin-bottom: 10px; background: #111; border: 1px solid #333; color: white; border-radius: 5px; box-sizing: border-box; }
+        .btn-accion { width: 100%; padding: 15px; background: var(--accent); border: none; color: white; font-weight: bold; border-radius: 5px; margin-top: 10px; cursor: pointer; }
+        .modulo-edit { background: #1a1a1a; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid var(--neon); }
+        .btn-ws { position: fixed; bottom: 20px; right: 20px; background: #25d366; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: white; text-decoration: none; }
     </style>
 </head>
 <body>
 
     <div id="vista-comensal">
-        <img id="banner-cliente" src="" alt="Banner">
+        <img id="banner-cliente" src="">
         <div class="header">
             <h1 class="marca-titulo" id="display-nombre" onclick="activarGesto()">MATRIZ CORE</h1>
-            <p id="display-whatsapp" style="font-size: 0.8rem; color: var(--neon);"></p>
+            <p id="display-whatsapp" style="color: var(--neon);"></p>
         </div>
-
-        <div id="contenedor-acordeones">
-            </div>
+        <div id="contenedor-acordeones"></div>
     </div>
 
     <div id="vista-editor">
-        <h2 style="color: var(--neon); text-align: center;">CONSOLA DE GESTIÓN</h2>
-        
-        <label>Nombre de Marca:</label>
-        <input type="text" id="edit-nombre" class="campo-editor">
-        
-        <label>URL Banner Superior:</label>
-        <input type="text" id="edit-banner" class="campo-editor" placeholder="https://...">
-
-        <label>WhatsApp (solo números):</label>
-        <input type="text" id="edit-ws" class="campo-editor">
-
-        <label>PIN de Seguridad:</label>
-        <input type="text" id="edit-pin" class="campo-editor" value="1234">
-
-        <hr style="border: 0.5px solid #333; margin: 20px 0;">
-        
+        <h2 style="color: var(--neon); text-align: center;">CONSOLA</h2>
+        <input type="text" id="edit-nombre" class="campo-editor" placeholder="Nombre de Marca">
+        <input type="text" id="edit-banner" class="campo-editor" placeholder="URL Banner">
+        <input type="text" id="edit-ws" class="campo-editor" placeholder="WhatsApp">
+        <input type="text" id="edit-pin" class="campo-editor" placeholder="PIN">
         <div id="lista-modulos-edit"></div>
-
-        <button class="btn-accion" onclick="agregarModuloNuevo()" style="background: #222; border: 1px solid var(--accent);">+ AÑADIR PLATO</button>
-        <button class="btn-accion" onclick="descargarPaquete()">DESCARGAR PAQUETE ZIP</button>
-        <button class="btn-accion" onclick="document.getElementById('input-file').click()" style="background: #444;">CARGAR JSON ANTERIOR</button>
+        <button class="btn-accion" onclick="agregarModuloNuevo()">+ AÑADIR PLATO</button>
+        <button class="btn-accion" onclick="descargarPaquete()">DESCARGAR ZIP</button>
+        <button class="btn-accion" onclick="document.getElementById('input-file').click()" style="background:#444">CARGAR JSON</button>
         <input type="file" id="input-file" style="display:none" onchange="cargarArchivo(this)">
-        <button class="btn-accion" onclick="cerrarEditor()" style="background: #333;">SALIR DE CONSOLA</button>
+        <button class="btn-accion" onclick="cerrarEditor()" style="background:#333">SALIR</button>
     </div>
 
     <a id="link-ws" href="#" class="btn-ws" target="_blank"><i class="fab fa-whatsapp"></i></a>
 
     <script>
+        // Datos iniciales de respaldo para que la web NO se vea vacía
         let datosApp = {
             marca: "MI NEGOCIO",
             banner: "",
-            whatsapp: "549",
+            whatsapp: "5493764000000",
             pin: "1234",
             productos: []
         };
 
         let clicsMarca = 0;
 
-        // --- LÓGICA DE CONTROL ---
+        // Intentar cargar datos del servidor, si falla, usa los de arriba
+        fetch('data.json')
+            .then(response => response.json())
+            .then(data => {
+                datosApp = data;
+                renderizarMenuComensal();
+            })
+            .catch(err => {
+                console.log("Iniciando con datos por defecto...");
+                renderizarMenuComensal();
+            });
+
         function activarGesto() {
             clicsMarca++;
             if(clicsMarca === 3) {
-                const pass = prompt("INGRESE PIN DE ACCESO:");
-                if(pass === datosApp.pin) {
-                    abrirEditor();
-                } else {
-                    alert("PIN INCORRECTO");
-                }
+                const pass = prompt("PIN:");
+                if(pass === datosApp.pin) abrirEditor();
                 clicsMarca = 0;
             }
             setTimeout(() => clicsMarca = 0, 1500);
@@ -216,164 +102,82 @@
         function cerrarEditor() {
             document.getElementById('vista-comensal').style.display = 'block';
             document.getElementById('vista-editor').style.display = 'none';
-            window.scrollTo(0,0);
         }
 
-        // --- FUNCIONES DE LA CONSOLA ---
         function rellenarConsola() {
             document.getElementById('edit-nombre').value = datosApp.marca;
             document.getElementById('edit-banner').value = datosApp.banner;
             document.getElementById('edit-ws').value = datosApp.whatsapp;
             document.getElementById('edit-pin').value = datosApp.pin;
-            
             const lista = document.getElementById('lista-modulos-edit');
             lista.innerHTML = '';
-            
-            datosApp.productos.forEach((prod, index) => {
+            datosApp.productos.forEach((p, i) => {
                 lista.innerHTML += `
                     <div class="modulo-edit">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                            <span style="color:var(--accent)">PLATO #${index+1}</span>
-                            <div style="background:#000; padding:5px; border-radius:5px; display:flex; align-items:center;">
-                                <small style="margin-right:5px">STOCK:</small>
-                                <input type="checkbox" onchange="cambiarStock(${index}, this.checked)" ${prod.disponible ? 'checked' : ''}>
-                            </div>
-                        </div>
-                        <select class="campo-editor" onchange="actualizarDato(${index}, 'categoria', this.value)">
-                            <option value="principal" ${prod.categoria=='principal'?'selected':''}>🍽️ Principal</option>
-                            <option value="rapida" ${prod.categoria=='rapida'?'selected':''}>🍔 Rápida</option>
-                            <option value="bebida" ${prod.categoria=='bebida'?'selected':''}>🥤 Bebida</option>
-                            <option value="postre" ${prod.categoria=='postre'?'selected':''}>🍰 Postre</option>
+                        <input type="checkbox" onchange="datosApp.productos[${i}].disponible=this.checked" ${p.disponible?'checked':''}> Stock
+                        <select class="campo-editor" onchange="datosApp.productos[${i}].categoria=this.value">
+                            <option value="principal" ${p.categoria=='principal'?'selected':''}>Principal</option>
+                            <option value="rapida" ${p.categoria=='rapida'?'selected':''}>Rápida</option>
+                            <option value="bebida" ${p.categoria=='bebida'?'selected':''}>Bebida</option>
                         </select>
-                        <input type="text" class="campo-editor" placeholder="Nombre del plato" value="${prod.nombre}" oninput="actualizarDato(${index}, 'nombre', this.value)">
-                        <input type="text" class="campo-editor" placeholder="Precio" value="${prod.p1}" oninput="actualizarDato(${index}, 'p1', this.value)">
-                        <textarea class="campo-editor" placeholder="URL imagen" oninput="actualizarDato(${index}, 'imgs', [this.value])">${prod.imgs[0] || ''}</textarea>
-                        <button onclick="eliminarModulo(${index})" style="background:red; color:white; border:none; padding:5px; border-radius:3px; font-size:0.7rem;">ELIMINAR</button>
-                    </div>
-                `;
+                        <input type="text" class="campo-editor" value="${p.nombre}" oninput="datosApp.productos[${i}].nombre=this.value">
+                        <input type="text" class="campo-editor" value="${p.p1}" oninput="datosApp.productos[${i}].p1=this.value">
+                        <input type="text" class="campo-editor" value="${p.imgs[0]}" oninput="datosApp.productos[${i}].imgs=[this.value]">
+                        <button onclick="datosApp.productos.splice(${i},1);rellenarConsola()">Borrar</button>
+                    </div>`;
             });
         }
 
         function agregarModuloNuevo() {
-            datosApp.productos.push({
-                nombre: "Nuevo Plato",
-                categoria: "principal",
-                disponible: true,
-                p1: "0",
-                imgs: [""],
-                desc: ""
-            });
+            datosApp.productos.push({nombre:"Nuevo", categoria:"principal", disponible:true, p1:"0", imgs:[""], desc:""});
             rellenarConsola();
         }
 
-        function actualizarDato(index, campo, valor) {
-            datosApp[campo] ? datosApp[campo] = valor : datosApp.productos[index][campo] = valor;
-            renderizarMenuComensal();
-        }
-        
-        function cambiarStock(index, valor) {
-            datosApp.productos[index].disponible = valor;
-            renderizarMenuComensal();
-        }
-
-        function eliminarModulo(index) {
-            datosApp.productos.splice(index, 1);
-            rellenarConsola();
-            renderizarMenuComensal();
-        }
-
-        // --- RENDERIZADO DEL MENÚ ---
         function renderizarMenuComensal() {
-            // Actualizar Identidad
             document.getElementById('display-nombre').innerText = datosApp.marca;
-            document.getElementById('display-whatsapp').innerText = "WP: " + datosApp.whatsapp;
+            document.getElementById('display-whatsapp').innerText = "WhatsApp: " + datosApp.whatsapp;
             const b = document.getElementById('banner-cliente');
-            if(datosApp.banner) { b.src = datosApp.banner; b.style.display = 'block'; } else { b.style.display = 'none'; }
-            document.getElementById('link-ws').href = "https://wa.me/" + datosApp.whatsapp;
-
-            const contenedor = document.getElementById('contenedor-acordeones');
-            contenedor.innerHTML = '';
-
-            const cats = [
-                { id: 'principal', label: 'PLATOS PRINCIPALES', icon: 'fa-utensils' },
-                { id: 'rapida', label: 'COMIDA RÁPIDA', icon: 'fa-burger' },
-                { id: 'bebida', label: 'BEBIDAS Y TRAGOS', icon: 'fa-wine-glass' },
-                { id: 'postre', label: 'POSTRES', icon: 'fa-ice-cream' }
-            ];
-
-            cats.forEach(cat => {
-                const prods = datosApp.productos.filter(p => p.categoria === cat.id);
-                if(prods.length > 0) {
-                    let htmlCat = `
-                        <button class="categoria-btn" onclick="toggleAcc('${cat.id}')">
-                            <span><i class="fas ${cat.icon}"></i> ${cat.label}</span>
-                            <i class="fas fa-chevron-down" id="arr-${cat.id}"></i>
-                        </button>
-                        <div class="categoria-contenido" id="cont-${cat.id}">
-                    `;
-
-                    prods.forEach(p => {
-                        const stockClase = p.disponible ? 'luz-verde' : 'luz-roja';
-                        const agotadoClase = p.disponible ? '' : 'agotado';
-                        htmlCat += `
-                            <div class="producto-card ${agotadoClase}">
-                                <div class="luz-stock ${stockClase}"></div>
-                                ${!p.disponible ? '<div class="badge-agotado">AGOTADO</div>' : ''}
-                                <img src="${p.imgs[0] || 'https://via.placeholder.com/100'}" class="prod-img">
-                                <div class="prod-info">
-                                    <h3>${p.nombre}</h3>
-                                    <span class="prod-precio">$${p.p1}</span>
-                                </div>
-                            </div>
-                        `;
+            if(datosApp.banner) { b.src = datosApp.banner; b.style.display = 'block'; }
+            const cont = document.getElementById('contenedor-acordeones');
+            cont.innerHTML = '';
+            const cats = [{id:'principal', n:'PRINCIPALES'}, {id:'rapida', n:'RÁPIDA'}, {id:'bebida', n:'BEBIDAS'}];
+            cats.forEach(c => {
+                const ps = datosApp.productos.filter(p => p.categoria === c.id);
+                if(ps.length > 0) {
+                    let h = `<button class="categoria-btn" onclick="this.nextElementSibling.classList.toggle('abierto')">${c.n} <span>+</span></button><div class="categoria-contenido">`;
+                    ps.forEach(p => {
+                        h += `<div class="producto-card ${p.disponible?'':'agotado'}">
+                            <div class="luz-stock ${p.disponible?'luz-verde':'luz-roja'}"></div>
+                            <img src="${p.imgs[0]||'https://via.placeholder.com/100'}" class="prod-img">
+                            <div class="prod-info"><h3>${p.nombre}</h3><span class="prod-precio">$${p.p1}</span></div>
+                        </div>`;
                     });
-
-                    htmlCat += `</div>`;
-                    contenedor.innerHTML += htmlCat;
+                    cont.innerHTML += h + `</div>`;
                 }
             });
         }
 
-        function toggleAcc(id) {
-            const c = document.getElementById('cont-' + id);
-            const a = document.getElementById('arr-' + id);
-            c.classList.toggle('abierto');
-            a.style.transform = c.classList.contains('abierto') ? 'rotate(180deg)' : 'rotate(0deg)';
-        }
-
-        // --- CARGAR Y DESCARGAR ---
         function descargarPaquete() {
-            // Actualizamos los datos principales desde los inputs antes de descargar
             datosApp.marca = document.getElementById('edit-nombre').value;
             datosApp.banner = document.getElementById('edit-banner').value;
             datosApp.whatsapp = document.getElementById('edit-ws').value;
             datosApp.pin = document.getElementById('edit-pin').value;
-
             const zip = new JSZip();
             zip.file("data.json", JSON.stringify(datosApp, null, 2));
-            zip.generateAsync({type:"blob"}).then(function(content) {
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(content);
-                link.download = datosApp.marca.replace(/\s+/g, '_') + "_CORE_V20.zip";
-                link.click();
+            zip.generateAsync({type:"blob"}).then(c => {
+                const l = document.createElement('a');
+                l.href = URL.createObjectURL(c);
+                l.download = "data_actualizada.zip";
+                l.click();
             });
         }
 
-        function cargarArchivo(input) {
-            const reader = new FileReader();
-            reader.onload = function() {
-                datosApp = JSON.parse(reader.result);
-                renderizarMenuComensal();
-                rellenarConsola();
-                alert("Datos cargados con éxito");
-            };
-            reader.readAsText(input.files[0]);
+        function cargarArchivo(f) {
+            const r = new FileReader();
+            r.onload = () => { datosApp = JSON.parse(r.result); renderizarMenuComensal(); rellenarConsola(); };
+            r.readAsText(f.files[0]);
         }
-
-        // Inicio automático
-        renderizarMenuComensal();
-
     </script>
 </body>
-  </html>
-  
+    </html>
+    
