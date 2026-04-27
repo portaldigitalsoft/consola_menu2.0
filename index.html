@@ -3,59 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MATRIZ CORE V2.6 - ADMIN STOCK</title>
+    <title>MATRIZ CORE V2.8 - ADMIN STOCK</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --p: #ff8c00; --s: #00f2ff; --bg: #000; --c: #111; }
-        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; padding: 15px; margin: 0; }
+        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; padding: 15px; margin: 0; padding-bottom: 50px; }
         .container { max-width: 600px; margin: auto; border: 1px solid var(--s); padding: 15px; border-radius: 12px; box-shadow: 0 0 15px rgba(0,242,255,0.1); }
-        h2 { color: var(--p); text-align: center; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; }
-        .status-save { text-align: center; font-size: 0.6rem; color: #555; margin-bottom: 15px; text-transform: uppercase; }
+        h2 { color: var(--p); text-align: center; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; font-size: 1.4rem; }
+        .status-save { text-align: center; font-size: 0.65rem; color: #00ff00; margin-bottom: 15px; text-transform: uppercase; font-weight: bold; }
         .section { background: var(--c); padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #333; }
         label { display: block; color: var(--s); font-size: 0.7rem; margin-bottom: 5px; text-transform: uppercase; font-weight: bold; }
-        input, select { width: 100%; padding: 12px; margin-bottom: 10px; background: #000; border: 1px solid #444; color: #fff; border-radius: 6px; box-sizing: border-box; }
+        input, select, textarea { width: 100%; padding: 12px; margin-bottom: 10px; background: #000; border: 1px solid #444; color: #fff; border-radius: 6px; box-sizing: border-box; font-family: inherit; }
         .mod-plato { border-left: 4px solid var(--p); padding: 15px; margin-bottom: 20px; background: #080808; position: relative; }
         .row-precio { display: flex; gap: 8px; margin-bottom: 5px; }
-        .btn-add { width: 100%; padding: 15px; background: none; border: 2px dashed var(--s); color: var(--s); font-weight: bold; border-radius: 8px; cursor: pointer; margin-bottom: 10px; }
-        .btn-zip { width: 100%; padding: 20px; background: var(--p); border: none; color: #fff; font-weight: bold; font-size: 1.2rem; border-radius: 10px; cursor: pointer; }
-        .btn-reset { background: none; border: none; color: #444; font-size: 0.7rem; cursor: pointer; display: block; margin: 20px auto; text-decoration: underline; }
+        .btn-add { width: 100%; padding: 15px; background: none; border: 2px dashed var(--s); color: var(--s); font-weight: bold; border-radius: 8px; cursor: pointer; margin-bottom: 10px; transition: 0.3s; }
+        .btn-add:hover { background: rgba(0,242,255,0.05); }
+        .btn-zip { width: 100%; padding: 20px; background: var(--p); border: none; color: #fff; font-weight: bold; font-size: 1.1rem; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 15px rgba(255,140,0,0.3); }
+        .btn-reset { background: #200; border: 1px solid #500; color: #ff4444; font-size: 0.7rem; cursor: pointer; display: block; margin: 20px auto; padding: 8px; border-radius: 4px; }
         
-        #live-preview { border: 2px solid #333; margin-top: 40px; border-radius: 15px; overflow: hidden; background: #000; zoom: 0.8; }
-        .p-banner { width: 100%; height: 140px; object-fit: cover; background: #222; border-bottom: 2px solid var(--p); }
-        .p-card { display: flex; background: #151515; margin: 10px; border-radius: 8px; border: 1px solid #222; overflow: hidden; position: relative; }
-        .p-img { width: 120px; height: 80px; object-fit: cover; }
+        /* Estilos Preview */
+        #live-preview { border: 2px solid #333; margin-top: 30px; border-radius: 15px; overflow: hidden; background: #000; zoom: 0.85; }
+        .p-banner { width: 100%; height: 150px; object-fit: cover; background: #222; border-bottom: 2px solid var(--p); }
+        .p-card { display: flex; background: #121212; margin: 10px; border-radius: 8px; border: 1px solid #222; overflow: hidden; position: relative; min-height: 100px; }
+        .p-img { width: 110px; height: 110px; object-fit: cover; }
         .p-info { padding: 10px; flex: 1; }
-        .p-v { font-size: 0.7rem; color: var(--s); margin-top: 5px; display: flex; flex-direction: column; }
-        .p-agotado { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-10deg); color: red; font-weight: bold; border: 2px solid red; padding: 5px; text-shadow: 0 0 10px #000; display: none; }
+        .p-desc { font-size: 0.7rem; color: #888; margin: 4px 0; }
+        .p-v { font-size: 0.7rem; color: var(--s); display: flex; flex-direction: column; gap: 2px; font-weight: bold; }
+        .p-agotado { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; color: red; font-weight: bold; border: 1px solid red; z-index: 10; text-transform: uppercase; letter-spacing: 2px; pointer-events: none; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>FÁBRICA CORE V2.6</h2>
-    <div class="status-save"><i class="fas fa-save"></i> Memoria activa (No se reinicia al refrescar)</div>
+    <h2>FÁBRICA CORE V2.8</h2>
+    <div class="status-save"><i class="fas fa-database"></i> Memoria Activa Persistente</div>
     
     <div class="section">
         <label>Banner del Local:</label>
         <input type="file" accept="image/*" onchange="readImg(this, 'banner')">
         <label>Nombre del Negocio:</label>
-        <input type="text" id="m-name" placeholder="Pizzería Paco" oninput="saveAndLive()">
-        <label>WhatsApp (549...):</label>
+        <input type="text" id="m-name" placeholder="Ej: Pizzería Paco" oninput="saveAndLive()">
+        <label>WhatsApp (Cod. País + Número):</label>
         <input type="text" id="m-ws" placeholder="5493764000000" oninput="saveAndLive()">
-        <label>PIN ACCESO DUEÑO (Panel Admin):</label>
+        <label>PIN ACCESO DUEÑO:</label>
         <input type="text" id="m-pin" placeholder="Ej: 1234" oninput="saveAndLive()">
     </div>
 
     <div id="lista"></div>
-    <button class="btn-add" onclick="addP()">+ AGREGAR NUEVO PLATO</button>
-    <button class="btn-zip" onclick="makeZip()">📦 DESCARGAR ZIP PARA CLIENTE</button>
-    <button class="btn-reset" onclick="resetFactory()">Reiniciar Fábrica (Borrar Todo)</button>
+    
+    <button class="btn-add" onclick="addP()"><i class="fas fa-plus"></i> AGREGAR NUEVO PLATO</button>
+    <button class="btn-zip" onclick="makeZip()"><i class="fas fa-file-archive"></i> DESCARGAR ZIP PARA CLIENTE</button>
+    
+    <button class="btn-reset" onclick="resetFactory()">Reiniciar y Borrar Todo</button>
 
-    <div style="margin-top:40px; text-align:center; color:#666; font-size:0.8rem;">PREVIEW DEL CLIENTE</div>
+    <div style="margin-top:30px; text-align:center; color:#555; font-size:0.7rem; text-transform:uppercase;">Previsualización en tiempo real</div>
+    
     <div id="live-preview">
-        <img id="p-bn" class="p-banner" src="https://via.placeholder.com/600x200?text=Banner+Local">
-        <h3 id="p-name" style="text-align:center; color:var(--p); margin:15px 0;">NOMBRE</h3>
+        <img id="p-bn" class="p-banner" src="https://via.placeholder.com/600x200?text=Banner+del+Local">
+        <h3 id="p-name" style="text-align:center; color:var(--p); margin:15px 0; text-transform: uppercase;">NOMBRE</h3>
         <div id="p-list"></div>
     </div>
 </div>
@@ -64,85 +70,160 @@
     let bannerB64 = "";
     let prods = [];
 
+    // --- COMPRESIÓN DE IMAGEN PARA LOCALSTORAGE ---
+    async function optimizarImagen(file) {
+        return new Promise((resolve) => {
+            const r = new FileReader();
+            r.readAsDataURL(file);
+            r.onload = (e) => {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const MAX_W = 500;
+                    let scale = MAX_W / img.width;
+                    canvas.width = MAX_W;
+                    canvas.height = img.height * scale;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    resolve(canvas.toDataURL('image/jpeg', 0.7));
+                };
+            };
+        });
+    }
+
     function saveToStorage() {
-        const data = { mName: document.getElementById('m-name').value, mWs: document.getElementById('m-ws').value, mPin: document.getElementById('m-pin').value, banner: bannerB64, items: prods };
-        localStorage.setItem('core_factory_v26', JSON.stringify(data));
+        const data = { 
+            mName: document.getElementById('m-name').value, 
+            mWs: document.getElementById('m-ws').value, 
+            mPin: document.getElementById('m-pin').value, 
+            banner: bannerB64, 
+            items: prods 
+        };
+        localStorage.setItem('core_v28_data', JSON.stringify(data));
     }
 
     function loadFromStorage() {
-        const raw = localStorage.getItem('core_factory_v26');
+        const raw = localStorage.getItem('core_v28_data');
         if(!raw) return;
-        const data = JSON.parse(raw);
-        document.getElementById('m-name').value = data.mName || "";
-        document.getElementById('m-ws').value = data.mWs || "";
-        document.getElementById('m-pin').value = data.mPin || "";
-        bannerB64 = data.banner || "";
+        const d = JSON.parse(raw);
+        document.getElementById('m-name').value = d.mName || "";
+        document.getElementById('m-ws').value = d.mWs || "";
+        document.getElementById('m-pin').value = d.mPin || "";
+        bannerB64 = d.banner || "";
         if(bannerB64) document.getElementById('p-bn').src = bannerB64;
-        prods = data.items || [];
+        prods = d.items || [];
         prods.forEach(p => renderPlatoHTML(p));
         saveAndLive();
     }
 
-    function resetFactory() { if(confirm("¿Borrar todo?")) { localStorage.removeItem('core_factory_v26'); location.reload(); } }
-
-    function readImg(input, target, id) {
-        const r = new FileReader();
-        r.onload = (e) => {
-            if(target === 'banner') { bannerB64 = e.target.result; document.getElementById('p-bn').src = bannerB64; }
-            else { const p = prods.find(x => x.id === id); p.img = e.target.result; }
-            saveAndLive();
-        };
-        r.readAsDataURL(input.files[0]);
+    async function readImg(input, target, id) {
+        if(!input.files[0]) return;
+        const imgOpt = await optimizarImagen(input.files[0]);
+        if(target === 'banner') { 
+            bannerB64 = imgOpt; 
+            document.getElementById('p-bn').src = bannerB64; 
+        } else { 
+            const p = prods.find(x => x.id === id); 
+            if(p) p.img = imgOpt; 
+        }
+        saveAndLive();
     }
 
     function renderPlatoHTML(p) {
         const h = `<div class="section mod-plato" id="div-${p.id}">
-            <label>Foto:</label><input type="file" accept="image/*" onchange="readImg(this, 'p', ${p.id})">
-            <input type="text" placeholder="Nombre" value="${p.n}" oninput="upd(${p.id},'n',this.value)">
-            <div class="row-precio"><input type="text" placeholder="Etiq" value="${p.v1}" oninput="upd(${p.id},'v1',this.value)"><input type="number" placeholder="$" value="${p.p1}" oninput="upd(${p.id},'p1',this.value)"></div>
-            <div class="row-precio"><input type="text" placeholder="Etiq" value="${p.v2}" oninput="upd(${p.id},'v2',this.value)"><input type="number" placeholder="$" value="${p.p2}" oninput="upd(${p.id},'p2',this.value)"></div>
-            <div class="row-precio"><input type="text" placeholder="Etiq" value="${p.v3}" oninput="upd(${p.id},'v3',this.value)"><input type="number" placeholder="$" value="${p.p3}" oninput="upd(${p.id},'p3',this.value)"></div>
-            <label style="display:inline">¿Tiene Stock? </label><input type="checkbox" style="width:auto" ${p.stock?'checked':''} onchange="upd(${p.id},'stock',this.checked)">
-            <select onchange="upd(${p.id},'cat',this.value)">
-                <option value="principal" ${p.cat=='principal'?'selected':''}>🍽️ Platos</option>
-                <option value="rapida" ${p.cat=='rapida'?'selected':''}>🍔 Rápida</option>
-                <option value="bebida" ${p.cat=='bebida'?'selected':''}>🥤 Bebidas</option>
-            </select>
-            <button onclick="del(${p.id})" style="color:red; background:none; border:none; cursor:pointer; font-size:0.7rem;">ELIMINAR</button>
+            <label>Imagen del Plato:</label>
+            <input type="file" accept="image/*" onchange="readImg(this, 'p', ${p.id})">
+            
+            <input type="text" placeholder="Nombre (Ej: Empanadas)" value="${p.n}" oninput="upd(${p.id},'n',this.value)">
+            <textarea placeholder="Descripción (Ej: Carne cortada a cuchillo)" oninput="upd(${p.id},'d',this.value)">${p.d || ''}</textarea>
+            
+            <div class="row-precio">
+                <input type="text" placeholder="Etiq 1" value="${p.v1}" oninput="upd(${p.id},'v1',this.value)">
+                <input type="number" placeholder="$" value="${p.p1}" oninput="upd(${p.id},'p1',this.value)">
+            </div>
+            <div class="row-precio">
+                <input type="text" placeholder="Etiq 2" value="${p.v2}" oninput="upd(${p.id},'v2',this.value)">
+                <input type="number" placeholder="$" value="${p.p2}" oninput="upd(${p.id},'p2',this.value)">
+            </div>
+            <div class="row-precio">
+                <input type="text" placeholder="Etiq 3" value="${p.v3}" oninput="upd(${p.id},'v3',this.value)">
+                <input type="number" placeholder="$" value="${p.p3}" oninput="upd(${p.id},'p3',this.value)">
+            </div>
+
+            <div style="display:flex; align-items:center; gap:10px; margin:10px 0;">
+                <label style="margin:0">¿Stock?</label>
+                <input type="checkbox" style="width:auto; margin:0" ${p.stock?'checked':''} onchange="upd(${p.id},'stock',this.checked)">
+                
+                <select style="margin:0" onchange="upd(${p.id},'cat',this.value)">
+                    <option value="principal" ${p.cat=='principal'?'selected':''}>🍽️ Platos</option>
+                    <option value="rapida" ${p.cat=='rapida'?'selected':''}>🍔 Rápida</option>
+                    <option value="bebida" ${p.cat=='bebida'?'selected':''}>🥤 Bebidas</option>
+                </select>
+            </div>
+            
+            <button onclick="del(${p.id})" style="color:red; background:none; border:none; cursor:pointer; font-size:0.6rem; text-transform:uppercase;">[ Eliminar ]</button>
         </div>`;
         document.getElementById('lista').insertAdjacentHTML('beforeend', h);
     }
 
     function addP() {
         const id = Date.now();
-        const p = {id, n:'', cat:'principal', img:'', v1:'', p1:'', v2:'', p2:'', v3:'', p3:'', stock:true};
-        prods.push(p); renderPlatoHTML(p); saveAndLive();
+        const p = {id, n:'', d:'', cat:'principal', img:'', v1:'Unidad', p1:'', v2:'Media', p2:'', v3:'Docena', p3:'', stock:true};
+        prods.push(p);
+        renderPlatoHTML(p);
+        saveAndLive();
     }
 
-    function upd(id, k, v) { prods.find(x => x.id === id)[k] = v; saveAndLive(); }
-    function del(id) { document.getElementById('div-'+id).remove(); prods=prods.filter(x=>x.id!==id); saveAndLive(); }
+    function upd(id, k, v) { const p = prods.find(x=>x.id===id); if(p) p[k]=v; saveAndLive(); }
+    
+    function del(id) { 
+        if(confirm("¿Eliminar?")) {
+            document.getElementById('div-'+id).remove();
+            prods = prods.filter(x=>x.id!==id);
+            saveAndLive();
+        }
+    }
 
     function saveAndLive() {
         saveToStorage();
         document.getElementById('p-name').innerText = document.getElementById('m-name').value || "NOMBRE";
-        const list = document.getElementById('p-list'); list.innerHTML = '';
+        const list = document.getElementById('p-list'); 
+        list.innerHTML = '';
+        
         prods.forEach(p => {
+            let preciosHTML = "";
+            if(p.p1) preciosHTML += `<span>${p.v1}: $${p.p1}</span>`;
+            if(p.p2) preciosHTML += `<span>${p.v2}: $${p.p2}</span>`;
+            if(p.p3) preciosHTML += `<span>${p.v3}: $${p.p3}</span>`;
+
             list.innerHTML += `<div class="p-card">
-                <div class="p-agotado" style="display:${p.stock?'none':'block'}">AGOTADO</div>
-                <img class="p-img" src="${p.img || 'https://via.placeholder.com/120x80'}" style="filter:${p.stock?'none':'grayscale(1)'}">
+                ${!p.stock ? '<div class="p-agotado">Agotado</div>' : ''}
+                <img class="p-img" src="${p.img || 'https://via.placeholder.com/110?text=S/F'}">
                 <div class="p-info">
-                    <div style="font-size:0.8rem; font-weight:bold;">${p.n || 'Producto'}</div>
-                    <div class="p-v">${p.stock ? (p.p1?'<span>'+p.v1+': $'+p.p1+'</span>':''):''}</div>
+                    <div style="font-weight:bold; font-size:0.9rem;">${p.n || 'Producto'}</div>
+                    <div class="p-desc">${p.d || ''}</div>
+                    <div class="p-v">${preciosHTML}</div>
                 </div>
             </div>`;
         });
     }
 
+    function resetFactory() { if(confirm("¿Borrar TODO el trabajo?")) { localStorage.clear(); location.reload(); } }
+
+    // --- GENERADOR DE ZIP ---
     function makeZip() {
-        const name = document.getElementById('m-name').value || "Menu";
-        const pin = document.getElementById('m-pin').value || "1234";
+        const name = document.getElementById('m-name').value || "Mi_Menu";
         const zip = new JSZip();
-        zip.file("data.json", JSON.stringify({ name, ws: document.getElementById('m-ws').value, pin, banner: bannerB64, items: prods }, null, 2));
+        const data = { 
+            name, 
+            ws: document.getElementById('m-ws').value, 
+            pin: document.getElementById('m-pin').value, 
+            banner: bannerB64, 
+            items: prods 
+        };
+
+        zip.file("data.json", JSON.stringify(data, null, 2));
 
         const indexHtml = `<!DOCTYPE html>
 <html lang="es">
@@ -153,39 +234,41 @@
     <style>
         :root { --p: #ff8c00; --s: #00f2ff; --bg: #000; }
         body { background: var(--bg); color: #fff; font-family: sans-serif; margin: 0; padding-bottom: 100px; }
-        .bn { width: 100%; height: 180px; object-fit: cover; border-bottom: 3px solid var(--p); }
-        .cat-btn { width: 100%; padding: 20px; background: #111; border: none; color: var(--p); text-align: left; font-weight: bold; border-bottom: 1px solid #222; display: flex; justify-content: space-between; }
+        .bn { width: 100%; height: 200px; object-fit: cover; border-bottom: 3px solid var(--p); }
+        .cat-btn { width: 100%; padding: 20px; background: #111; border: none; color: var(--p); text-align: left; font-weight: bold; border-bottom: 1px solid #222; display: flex; justify-content: space-between; font-size: 1.1rem; }
         .cat-box { display: none; padding: 10px; }
-        .card { display: flex; background: #151515; margin-bottom: 12px; border-radius: 8px; overflow: hidden; position: relative; border: 1px solid #222; transition: 0.3s; }
-        .card.off { opacity: 0.4; filter: grayscale(1); }
-        .card img { width: 120px; height: 90px; object-fit: cover; }
+        .card { display: flex; background: #151515; margin-bottom: 12px; border-radius: 8px; overflow: hidden; position: relative; border: 1px solid #222; }
+        .card.off { opacity: 0.5; filter: grayscale(1); }
+        .card img { width: 120px; height: 120px; object-fit: cover; }
         .info { padding: 10px; flex: 1; }
-        .v-box { display: flex; gap: 5px; margin-top: 8px; flex-wrap: wrap; }
-        .btn-p { background: #000; border: 1px solid var(--s); color: var(--s); font-size: 0.7rem; padding: 5px 8px; border-radius: 4px; cursor: pointer; }
-        .btn-ws { position: fixed; bottom: 20px; right: 20px; background: #25d366; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: #fff; z-index: 99; }
-        .agotado-txt { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg); color: #ff0000; font-weight: bold; font-size: 1.4rem; text-shadow: 0 0 10px #000, 0 0 5px red; border: 2px solid red; padding: 4px 8px; pointer-events: none; z-index: 5; }
-        .admin-ctrl { display:none; background: var(--p); color:#000; border:none; padding:5px; font-size:0.6rem; font-weight:bold; width:100%; cursor:pointer; }
+        .v-box { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+        .btn-p { background: #000; border: 1px solid var(--s); color: var(--s); font-size: 0.75rem; padding: 8px; border-radius: 6px; cursor: pointer; }
+        .btn-ws { position: fixed; bottom: 20px; right: 20px; background: #25d366; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #fff; z-index: 99; box-shadow: 0 4px 15px rgba(0,0,0,0.5); text-decoration: none; }
+        .agotado-tag { position: absolute; top: 10px; left: -30px; background: red; color: white; padding: 5px 30px; transform: rotate(-45deg); font-size: 0.6rem; font-weight: bold; }
     </style>
 </head>
 <body>
-    <img id="main-bn" class="bn" src="">
-    <h1 style="text-align:center; letter-spacing:2px; text-transform:uppercase;" onclick="handleAdmin()">${name}</h1>
+    <img id="main-bn" class="bn" src="${bannerB64 || ''}">
+    <h1 style="text-align:center; text-transform:uppercase;">${name}</h1>
     <div id="menu-container"></div>
-    <a href="#" class="btn-ws" onclick="sendPedido()"><i class="fab fa-whatsapp"></i></a>
+    <a href="javascript:void(0)" class="btn-ws" onclick="sendPedido()"><i class="fab fa-whatsapp"></i></a>
+
     <script>
-        let db; let pedido = []; let clicks = 0; let isAdmin = false;
-        fetch('data.json').then(r => r.json()).then(d => { db = d; if(d.banner) document.getElementById('main-bn').src = d.banner; render(); });
+        let db = ${JSON.stringify(data)};
+        let pedido = [];
+
         function render() {
-            const container = document.getElementById('menu-container'); container.innerHTML = '';
+            const container = document.getElementById('menu-container');
             const cats = [{id:'principal', n:'PLATOS'}, {id:'rapida', n:'RÁPIDA'}, {id:'bebida', n:'BEBIDAS'}];
             cats.forEach(c => {
                 const items = db.items.filter(x => x.cat === c.id);
                 if(items.length > 0) {
-                    let html = '<button class="cat-btn" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\\'block\\'?\\'none\\':\\'block\\'">'+c.n+' <i class="fas fa-chevron-down"></i></button><div class="cat-box">';
+                    let html = '<button class="cat-btn" onclick="toggle(this)">'+c.n+' <i class="fas fa-chevron-down"></i></button><div class="cat-box">';
                     items.forEach(p => {
-                        html += '<div class="card '+(p.stock?'':'off')+'" id="card-'+p.id+'">';
-                        if(!p.stock) html += '<div class="agotado-txt">AGOTADO</div>';
+                        html += '<div class="card '+(p.stock?'':'off')+'">';
+                        if(!p.stock) html += '<div class="agotado-tag">AGOTADO</div>';
                         html += '<img src="'+p.img+'"><div class="info"><h3>'+p.n+'</h3>';
+                        if(p.d) html += '<p style="font-size:0.8rem; color:#888;">'+p.d+'</p>';
                         if(p.stock) {
                             html += '<div class="v-box">';
                             if(p.p1) html += '<button class="btn-p" onclick="add(\\''+p.n+'\\',\\''+p.v1+'\\','+p.p1+')">'+p.v1+' $'+p.p1+'</button>';
@@ -193,44 +276,38 @@
                             if(p.p3) html += '<button class="btn-p" onclick="add(\\''+p.n+'\\',\\''+p.v3+'\\','+p.p3+')">'+p.v3+' $'+p.p3+'</button>';
                             html += '</div>';
                         }
-                        html += '<button class="admin-ctrl" style="display:'+(isAdmin?'block':'none')+'" onclick="toggleStock('+p.id+')">MODIFICAR STOCK</button>';
                         html += '</div></div>';
                     });
                     container.innerHTML += html + '</div>';
                 }
             });
         }
-        function toggleStock(id) { 
-            let p = db.items.find(x => x.id === id); p.stock = !p.stock; 
-            alert('Producto ' + (p.stock?'Disponible':'Agotado')); render();
-        }
-        function add(n, v, p) { pedido.push({n, v, p}); alert('Añadido: ' + n); }
+        function toggle(btn) { const box = btn.nextElementSibling; box.style.display = box.style.display==='block'?'none':'block'; }
+        function add(n, v, p) { pedido.push({n, v, p}); alert('Añadido: '+n+' ('+v+')'); }
         function sendPedido() {
-            if(pedido.length === 0) return alert('Vacío');
-            let m = "Pedido de ${name}:\\n\\n"; let total = 0;
-            pedido.forEach(i => { m += "✅ " + i.n + " ("+i.v+") $"+i.p+"\\n"; total += parseFloat(i.p); });
+            if(pedido.length === 0) return alert('El carrito está vacío');
+            let m = "Hola! Quisiera hacer el siguiente pedido:\\n\\n";
+            let total = 0;
+            pedido.forEach(i => { m += "✅ " + i.n + " ("+i.v+") - $"+i.p+"\\n"; total += parseFloat(i.p); });
             m += "\\n💰 TOTAL: $" + total;
             window.open("https://wa.me/" + db.ws + "?text=" + encodeURIComponent(m));
         }
-        function handleAdmin() {
-            clicks++; if(clicks === 3) {
-                if(prompt("PIN DE ACCESO:") === db.pin) { isAdmin = true; render(); alert("MODO ADMIN ACTIVADO: Ahora puedes gestionar stock."); }
-                clicks = 0;
-            }
-            setTimeout(() => clicks = 0, 2000);
-        }
+        render();
     <\/script>
 </body>
 </html>`;
+
         zip.file("index.html", indexHtml);
         zip.generateAsync({type:"blob"}).then(blob => {
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = name.replace(/ /g,'_') + "_MENU_V2.zip";
+            link.download = name.replace(/\s+/g, '_') + "_MENU_V2.zip";
             link.click();
         });
     }
+
     window.onload = loadFromStorage;
 </script>
 </body>
-</html>
+    </html>
+    
