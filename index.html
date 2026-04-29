@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MATRIZ CORE V2.8 - ADMIN STOCK</title>
+    <title>MATRIZ CORE V2.9 - QR & ADMIN</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -18,49 +18,46 @@
         .mod-plato { border-left: 4px solid var(--p); padding: 15px; margin-bottom: 20px; background: #080808; position: relative; }
         .row-precio { display: flex; gap: 8px; margin-bottom: 5px; }
         .btn-add { width: 100%; padding: 15px; background: none; border: 2px dashed var(--s); color: var(--s); font-weight: bold; border-radius: 8px; cursor: pointer; margin-bottom: 10px; transition: 0.3s; }
-        .btn-add:hover { background: rgba(0,242,255,0.05); }
         .btn-zip { width: 100%; padding: 20px; background: var(--p); border: none; color: #fff; font-weight: bold; font-size: 1.1rem; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 15px rgba(255,140,0,0.3); }
         .btn-reset { background: #200; border: 1px solid #500; color: #ff4444; font-size: 0.7rem; cursor: pointer; display: block; margin: 20px auto; padding: 8px; border-radius: 4px; }
         
-        /* Estilos Preview */
         #live-preview { border: 2px solid #333; margin-top: 30px; border-radius: 15px; overflow: hidden; background: #000; zoom: 0.85; }
         .p-banner { width: 100%; height: 150px; object-fit: cover; background: #222; border-bottom: 2px solid var(--p); }
         .p-card { display: flex; background: #121212; margin: 10px; border-radius: 8px; border: 1px solid #222; overflow: hidden; position: relative; min-height: 100px; }
         .p-img { width: 110px; height: 110px; object-fit: cover; }
         .p-info { padding: 10px; flex: 1; }
-        .p-desc { font-size: 0.7rem; color: #888; margin: 4px 0; }
         .p-v { font-size: 0.7rem; color: var(--s); display: flex; flex-direction: column; gap: 2px; font-weight: bold; }
-        .p-agotado { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; color: red; font-weight: bold; border: 1px solid red; z-index: 10; text-transform: uppercase; letter-spacing: 2px; pointer-events: none; }
+        .p-agotado { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; color: red; font-weight: bold; border: 1px solid red; z-index: 10; text-transform: uppercase; pointer-events: none; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>FÁBRICA CORE V2.8</h2>
-    <div class="status-save"><i class="fas fa-database"></i> Memoria Activa Persistente</div>
+    <h2>FÁBRICA CORE V2.9</h2>
+    <div class="status-save"><i class="fas fa-qrcode"></i> QR & ADMIN PANEL READY</div>
     
     <div class="section">
         <label>Banner del Local:</label>
         <input type="file" accept="image/*" onchange="readImg(this, 'banner')">
         <label>Nombre del Negocio:</label>
         <input type="text" id="m-name" placeholder="Ej: Pizzería Paco" oninput="saveAndLive()">
-        <label>WhatsApp (Cod. País + Número):</label>
+        <label>WhatsApp:</label>
         <input type="text" id="m-ws" placeholder="5493764000000" oninput="saveAndLive()">
         <label>PIN ACCESO DUEÑO:</label>
         <input type="text" id="m-pin" placeholder="Ej: 1234" oninput="saveAndLive()">
     </div>
 
     <div id="lista"></div>
-    
     <button class="btn-add" onclick="addP()"><i class="fas fa-plus"></i> AGREGAR NUEVO PLATO</button>
-    <button class="btn-zip" onclick="makeZip()"><i class="fas fa-file-archive"></i> DESCARGAR ZIP PARA CLIENTE</button>
-    
-    <button class="btn-reset" onclick="resetFactory()">Reiniciar y Borrar Todo</button>
+    <button class="btn-zip" onclick="makeZip()"><i class="fas fa-file-archive"></i> DESCARGAR ZIP</button>
+    <button class="btn-reset" onclick="resetFactory()">Borrar Todo</button>
 
-    <div style="margin-top:30px; text-align:center; color:#555; font-size:0.7rem; text-transform:uppercase;">Previsualización en tiempo real</div>
-    
     <div id="live-preview">
-        <img id="p-bn" class="p-banner" src="https://via.placeholder.com/600x200?text=Banner+del+Local">
+        <img id="p-bn" class="p-banner" src="https://via.placeholder.com/600x200?text=Banner">
+        <div style="text-align: center; background: #fff; padding: 10px; width: 200px; margin: 15px auto; border-radius: 10px;">
+            <img src="https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=URL_DE_TU_MENU&choe=UTF-8" style="width: 100%;">
+            <small style="color: #000; font-size: 0.6rem; display: block; font-weight: bold;">ESCANEÁ EL MENÚ</small>
+        </div>
         <h3 id="p-name" style="text-align:center; color:var(--p); margin:15px 0; text-transform: uppercase;">NOMBRE</h3>
         <div id="p-list"></div>
     </div>
@@ -70,7 +67,6 @@
     let bannerB64 = "";
     let prods = [];
 
-    // --- COMPRESIÓN DE IMAGEN PARA LOCALSTORAGE ---
     async function optimizarImagen(file) {
         return new Promise((resolve) => {
             const r = new FileReader();
@@ -82,8 +78,7 @@
                     const canvas = document.createElement('canvas');
                     const MAX_W = 500;
                     let scale = MAX_W / img.width;
-                    canvas.width = MAX_W;
-                    canvas.height = img.height * scale;
+                    canvas.width = MAX_W; canvas.height = img.height * scale;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                     resolve(canvas.toDataURL('image/jpeg', 0.7));
@@ -93,18 +88,12 @@
     }
 
     function saveToStorage() {
-        const data = { 
-            mName: document.getElementById('m-name').value, 
-            mWs: document.getElementById('m-ws').value, 
-            mPin: document.getElementById('m-pin').value, 
-            banner: bannerB64, 
-            items: prods 
-        };
-        localStorage.setItem('core_v28_data', JSON.stringify(data));
+        const data = { mName: document.getElementById('m-name').value, mWs: document.getElementById('m-ws').value, mPin: document.getElementById('m-pin').value, banner: bannerB64, items: prods };
+        localStorage.setItem('core_v29_data', JSON.stringify(data));
     }
 
     function loadFromStorage() {
-        const raw = localStorage.getItem('core_v28_data');
+        const raw = localStorage.getItem('core_v29_data');
         if(!raw) return;
         const d = JSON.parse(raw);
         document.getElementById('m-name').value = d.mName || "";
@@ -120,49 +109,24 @@
     async function readImg(input, target, id) {
         if(!input.files[0]) return;
         const imgOpt = await optimizarImagen(input.files[0]);
-        if(target === 'banner') { 
-            bannerB64 = imgOpt; 
-            document.getElementById('p-bn').src = bannerB64; 
-        } else { 
-            const p = prods.find(x => x.id === id); 
-            if(p) p.img = imgOpt; 
-        }
+        if(target === 'banner') { bannerB64 = imgOpt; document.getElementById('p-bn').src = bannerB64; }
+        else { const p = prods.find(x => x.id === id); if(p) p.img = imgOpt; }
         saveAndLive();
     }
 
     function renderPlatoHTML(p) {
         const h = `<div class="section mod-plato" id="div-${p.id}">
-            <label>Imagen del Plato:</label>
-            <input type="file" accept="image/*" onchange="readImg(this, 'p', ${p.id})">
-            
-            <input type="text" placeholder="Nombre (Ej: Empanadas)" value="${p.n}" oninput="upd(${p.id},'n',this.value)">
-            <textarea placeholder="Descripción (Ej: Carne cortada a cuchillo)" oninput="upd(${p.id},'d',this.value)">${p.d || ''}</textarea>
-            
+            <label>Imagen:</label><input type="file" onchange="readImg(this, 'p', ${p.id})">
+            <input type="text" placeholder="Nombre" value="${p.n}" oninput="upd(${p.id},'n',this.value)">
+            <textarea placeholder="Descripción" oninput="upd(${p.id},'d',this.value)">${p.d || ''}</textarea>
             <div class="row-precio">
-                <input type="text" placeholder="Etiq 1" value="${p.v1}" oninput="upd(${p.id},'v1',this.value)">
-                <input type="number" placeholder="$" value="${p.p1}" oninput="upd(${p.id},'p1',this.value)">
+                <input type="text" value="${p.v1}" oninput="upd(${p.id},'v1',this.value)">
+                <input type="number" value="${p.p1}" oninput="upd(${p.id},'p1',this.value)">
             </div>
-            <div class="row-precio">
-                <input type="text" placeholder="Etiq 2" value="${p.v2}" oninput="upd(${p.id},'v2',this.value)">
-                <input type="number" placeholder="$" value="${p.p2}" oninput="upd(${p.id},'p2',this.value)">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <label>¿Stock?</label><input type="checkbox" ${p.stock?'checked':''} onchange="upd(${p.id},'stock',this.checked)">
             </div>
-            <div class="row-precio">
-                <input type="text" placeholder="Etiq 3" value="${p.v3}" oninput="upd(${p.id},'v3',this.value)">
-                <input type="number" placeholder="$" value="${p.p3}" oninput="upd(${p.id},'p3',this.value)">
-            </div>
-
-            <div style="display:flex; align-items:center; gap:10px; margin:10px 0;">
-                <label style="margin:0">¿Stock?</label>
-                <input type="checkbox" style="width:auto; margin:0" ${p.stock?'checked':''} onchange="upd(${p.id},'stock',this.checked)">
-                
-                <select style="margin:0" onchange="upd(${p.id},'cat',this.value)">
-                    <option value="principal" ${p.cat=='principal'?'selected':''}>🍽️ Platos</option>
-                    <option value="rapida" ${p.cat=='rapida'?'selected':''}>🍔 Rápida</option>
-                    <option value="bebida" ${p.cat=='bebida'?'selected':''}>🥤 Bebidas</option>
-                </select>
-            </div>
-            
-            <button onclick="del(${p.id})" style="color:red; background:none; border:none; cursor:pointer; font-size:0.6rem; text-transform:uppercase;">[ Eliminar ]</button>
+            <button onclick="del(${p.id})" style="color:red; background:none; border:none; cursor:pointer; font-size:0.6rem;">[ Eliminar ]</button>
         </div>`;
         document.getElementById('lista').insertAdjacentHTML('beforeend', h);
     }
@@ -170,59 +134,35 @@
     function addP() {
         const id = Date.now();
         const p = {id, n:'', d:'', cat:'principal', img:'', v1:'Unidad', p1:'', v2:'Media', p2:'', v3:'Docena', p3:'', stock:true};
-        prods.push(p);
-        renderPlatoHTML(p);
-        saveAndLive();
+        prods.push(p); renderPlatoHTML(p); saveAndLive();
     }
 
     function upd(id, k, v) { const p = prods.find(x=>x.id===id); if(p) p[k]=v; saveAndLive(); }
-    
-    function del(id) { 
-        if(confirm("¿Eliminar?")) {
-            document.getElementById('div-'+id).remove();
-            prods = prods.filter(x=>x.id!==id);
-            saveAndLive();
-        }
-    }
+    function del(id) { if(confirm("¿Eliminar?")) { document.getElementById('div-'+id).remove(); prods = prods.filter(x=>x.id!==id); saveAndLive(); } }
 
     function saveAndLive() {
         saveToStorage();
         document.getElementById('p-name').innerText = document.getElementById('m-name').value || "NOMBRE";
-        const list = document.getElementById('p-list'); 
-        list.innerHTML = '';
-        
+        const list = document.getElementById('p-list'); list.innerHTML = '';
         prods.forEach(p => {
-            let preciosHTML = "";
-            if(p.p1) preciosHTML += `<span>${p.v1}: $${p.p1}</span>`;
-            if(p.p2) preciosHTML += `<span>${p.v2}: $${p.p2}</span>`;
-            if(p.p3) preciosHTML += `<span>${p.v3}: $${p.p3}</span>`;
-
             list.innerHTML += `<div class="p-card">
                 ${!p.stock ? '<div class="p-agotado">Agotado</div>' : ''}
-                <img class="p-img" src="${p.img || 'https://via.placeholder.com/110?text=S/F'}">
+                <img class="p-img" src="${p.img || 'https://via.placeholder.com/110'}">
                 <div class="p-info">
-                    <div style="font-weight:bold; font-size:0.9rem;">${p.n || 'Producto'}</div>
-                    <div class="p-desc">${p.d || ''}</div>
-                    <div class="p-v">${preciosHTML}</div>
+                    <div style="font-weight:bold;">${p.n || 'Producto'}</div>
+                    <div class="p-v">${p.p1?p.v1+': $'+p.p1:''}</div>
                 </div>
             </div>`;
         });
     }
 
-    function resetFactory() { if(confirm("¿Borrar TODO el trabajo?")) { localStorage.clear(); location.reload(); } }
+    function resetFactory() { if(confirm("¿Borrar todo?")) { localStorage.clear(); location.reload(); } }
 
-    // --- GENERADOR DE ZIP ---
     function makeZip() {
         const name = document.getElementById('m-name').value || "Mi_Menu";
+        const pin = document.getElementById('m-pin').value || "1234";
         const zip = new JSZip();
-        const data = { 
-            name, 
-            ws: document.getElementById('m-ws').value, 
-            pin: document.getElementById('m-pin').value, 
-            banner: bannerB64, 
-            items: prods 
-        };
-
+        const data = { name, ws: document.getElementById('m-ws').value, pin: pin, banner: bannerB64, items: prods };
         zip.file("data.json", JSON.stringify(data, null, 2));
 
         const indexHtml = `<!DOCTYPE html>
@@ -233,81 +173,71 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --p: #ff8c00; --s: #00f2ff; --bg: #000; }
-        body { background: var(--bg); color: #fff; font-family: sans-serif; margin: 0; padding-bottom: 100px; }
+        body { background: var(--bg); color: #fff; font-family: sans-serif; margin: 0; padding-bottom: 100px; text-align: center;}
         .bn { width: 100%; height: 200px; object-fit: cover; border-bottom: 3px solid var(--p); }
-        .cat-btn { width: 100%; padding: 20px; background: #111; border: none; color: var(--p); text-align: left; font-weight: bold; border-bottom: 1px solid #222; display: flex; justify-content: space-between; font-size: 1.1rem; }
-        .cat-box { display: none; padding: 10px; }
-        .card { display: flex; background: #151515; margin-bottom: 12px; border-radius: 8px; overflow: hidden; position: relative; border: 1px solid #222; }
+        .qr-box { background: #fff; padding: 15px; width: 200px; margin: 20px auto; border-radius: 12px; }
+        .card { display: flex; background: #151515; margin: 12px; border-radius: 8px; overflow: hidden; position: relative; border: 1px solid #222; text-align: left; }
         .card.off { opacity: 0.5; filter: grayscale(1); }
         .card img { width: 120px; height: 120px; object-fit: cover; }
         .info { padding: 10px; flex: 1; }
-        .v-box { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
-        .btn-p { background: #000; border: 1px solid var(--s); color: var(--s); font-size: 0.75rem; padding: 8px; border-radius: 6px; cursor: pointer; }
-        .btn-ws { position: fixed; bottom: 20px; right: 20px; background: #25d366; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #fff; z-index: 99; box-shadow: 0 4px 15px rgba(0,0,0,0.5); text-decoration: none; }
-        .agotado-tag { position: absolute; top: 10px; left: -30px; background: red; color: white; padding: 5px 30px; transform: rotate(-45deg); font-size: 0.6rem; font-weight: bold; }
+        .btn-p { background: #000; border: 1px solid var(--s); color: var(--s); padding: 8px; border-radius: 6px; cursor: pointer; margin-top:10px; }
+        .btn-ws { position: fixed; bottom: 20px; right: 20px; background: #25d366; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #fff; z-index: 99; text-decoration: none; }
+        .agotado-txt { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg); color: red; font-weight: bold; font-size: 1.5rem; text-shadow: 0 0 10px #000, 0 0 5px red; border: 2px solid red; padding: 5px; z-index: 20; pointer-events: none; }
+        .admin-btn { display:none; width: 100%; background: var(--p); color: #000; border: none; padding: 5px; font-size: 0.7rem; font-weight: bold; margin-top: 10px; cursor: pointer; }
     </style>
 </head>
 <body>
     <img id="main-bn" class="bn" src="${bannerB64 || ''}">
-    <h1 style="text-align:center; text-transform:uppercase;">${name}</h1>
+    <div class="qr-box">
+        <img src="https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl='+window.location.href+'&choe=UTF-8" style="width:100%">
+        <small style="color:#000; font-weight:bold;">ESCANEÁ EL MENÚ</small>
+    </div>
+    <h1 onclick="checkAdmin()">${name}</h1>
     <div id="menu-container"></div>
     <a href="javascript:void(0)" class="btn-ws" onclick="sendPedido()"><i class="fab fa-whatsapp"></i></a>
 
     <script>
-        let db = ${JSON.stringify(data)};
-        let pedido = [];
-
+        let db = ${JSON.stringify(data)}; let pedido = []; let clicks = 0; let isAdmin = false;
         function render() {
-            const container = document.getElementById('menu-container');
-            const cats = [{id:'principal', n:'PLATOS'}, {id:'rapida', n:'RÁPIDA'}, {id:'bebida', n:'BEBIDAS'}];
-            cats.forEach(c => {
-                const items = db.items.filter(x => x.cat === c.id);
-                if(items.length > 0) {
-                    let html = '<button class="cat-btn" onclick="toggle(this)">'+c.n+' <i class="fas fa-chevron-down"></i></button><div class="cat-box">';
-                    items.forEach(p => {
-                        html += '<div class="card '+(p.stock?'':'off')+'">';
-                        if(!p.stock) html += '<div class="agotado-tag">AGOTADO</div>';
-                        html += '<img src="'+p.img+'"><div class="info"><h3>'+p.n+'</h3>';
-                        if(p.d) html += '<p style="font-size:0.8rem; color:#888;">'+p.d+'</p>';
-                        if(p.stock) {
-                            html += '<div class="v-box">';
-                            if(p.p1) html += '<button class="btn-p" onclick="add(\\''+p.n+'\\',\\''+p.v1+'\\','+p.p1+')">'+p.v1+' $'+p.p1+'</button>';
-                            if(p.p2) html += '<button class="btn-p" onclick="add(\\''+p.n+'\\',\\''+p.v2+'\\','+p.p2+')">'+p.v2+' $'+p.p2+'</button>';
-                            if(p.p3) html += '<button class="btn-p" onclick="add(\\''+p.n+'\\',\\''+p.v3+'\\','+p.p3+')">'+p.v3+' $'+p.p3+'</button>';
-                            html += '</div>';
-                        }
-                        html += '</div></div>';
-                    });
-                    container.innerHTML += html + '</div>';
-                }
+            const container = document.getElementById('menu-container'); container.innerHTML = '';
+            db.items.forEach(p => {
+                let h = '<div class="card '+(p.stock?'':'off')+'">';
+                if(!p.stock) h += '<div class="agotado-txt">AGOTADO</div>';
+                h += '<img src="'+p.img+'"><div class="info"><h3>'+p.n+'</h3><p style="font-size:0.8rem; color:#888;">'+p.d+'</p>';
+                if(p.stock) h += '<button class="btn-p" onclick="add(\\''+p.n+'\\','+p.p1+')">'+p.v1+' $'+p.p1+'</button>';
+                h += '<button class="admin-btn" style="display:'+(isAdmin?'block':'none')+'" onclick="toggleStock('+p.id+')">GESTIONAR STOCK</button>';
+                h += '</div></div>';
+                container.innerHTML += h;
             });
         }
-        function toggle(btn) { const box = btn.nextElementSibling; box.style.display = box.style.display==='block'?'none':'block'; }
-        function add(n, v, p) { pedido.push({n, v, p}); alert('Añadido: '+n+' ('+v+')'); }
+        function toggleStock(id) { let p = db.items.find(x=>x.id===id); p.stock = !p.stock; render(); }
+        function add(n, p) { pedido.push({n, p}); alert('Añadido: '+n); }
         function sendPedido() {
-            if(pedido.length === 0) return alert('El carrito está vacío');
-            let m = "Hola! Quisiera hacer el siguiente pedido:\\n\\n";
-            let total = 0;
-            pedido.forEach(i => { m += "✅ " + i.n + " ("+i.v+") - $"+i.p+"\\n"; total += parseFloat(i.p); });
-            m += "\\n💰 TOTAL: $" + total;
-            window.open("https://wa.me/" + db.ws + "?text=" + encodeURIComponent(m));
+            if(pedido.length === 0) return alert('Vacío');
+            let m = "Hola! Mi pedido:\\n"; pedido.forEach(i => m += "✅ "+i.n+" $"+i.p+"\\n");
+            window.open("https://wa.me/"+db.ws+"?text="+encodeURIComponent(m));
+        }
+        function checkAdmin() {
+            clicks++; if(clicks === 3) {
+                if(prompt("PIN ADMIN:") === db.pin) { isAdmin = true; render(); alert("MODO ADMIN ON"); }
+                clicks = 0;
+            }
+            setTimeout(()=> clicks = 0, 2000);
         }
         render();
     <\/script>
 </body>
 </html>`;
-
         zip.file("index.html", indexHtml);
         zip.generateAsync({type:"blob"}).then(blob => {
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = name.replace(/\s+/g, '_') + "_MENU_V2.zip";
+            link.download = name.replace(/\s+/g, '_') + "_MENU_V2.9.zip";
             link.click();
         });
     }
-
     window.onload = loadFromStorage;
 </script>
 </body>
-    </html>
+            </html>
     
